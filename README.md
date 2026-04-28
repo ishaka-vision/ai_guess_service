@@ -30,8 +30,6 @@ This project explores how a backend service can interact with a large language m
 
 ## How it works
 
-## How it works
-
 ### Architecture
 
 ```
@@ -49,21 +47,18 @@ This separation makes it possible to work with large models without needing powe
 
 ## Design decisions
 
-## Design decisions
-
 I focused on clarity and incremental progress instead of building something overly complex:
 
-**Start simple** — I avoided databases and frameworks initially to focus on getting the full pipeline working end-to-end.
+**Start simple** : I avoided databases and frameworks initially to focus on getting the full pipeline working end-to-end.
 
-**Use a remote model** — Running DeepSeek-R1 locally wasn't practical, so I used a remote server connected via SSH instead.
+**Use a remote model** : Running DeepSeek-R1 locally wasn't practical, so I used a remote server connected via SSH instead.
 
-**SSH tunneling over direct deployment** — The simplest way to securely connect my local API to the remote LLM without changing infrastructure.
+**SSH tunneling over direct deployment** : The simplest way to securely connect my local API to the remote LLM without changing infrastructure.
 
-**Post-processing model output** — The model sometimes returns reasoning tokens (`<think>...</think>`), so I added a cleaning step to enforce a one-word answer.
+**Post-processing model output** : The model sometimes returns reasoning tokens (`<think>...</think>`), so I added a cleaning step to enforce a one-word answer.
 
-**Basic observability** — I track response time and request count to understand system behavior and performance.
+**Basic observability** : I track response time and request count to understand system behavior and performance.
 
-## How to run it
 ## How to run it
 
 ### 1. Clone the repository
@@ -95,7 +90,7 @@ pip install -r requirements.txt
 ```bash
 ssh -L 11434:localhost:11434 agentic@<server-ip>
 ```
-> This step is essential — it links your local API to the remote Ollama service.
+> This step is essential : it links your local API to the remote Ollama service.
 
 ### 5. Run the API
 ```bash
