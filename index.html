@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Guess Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #222;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #222;
+            font-size: 14px;
+        }
+        
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #333;
+            transition: border-color 0.2s;
+        }
+        
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #444;
+        }
+        
+        button:active {
+            background: #222;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 6px;
+            display: none;
+            border: 1px solid #eee;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result-item {
+            margin-bottom: 20px;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        
+        .result-value {
+            color: #222;
+            font-size: 15px;
+            word-break: break-word;
+        }
+        
+        .guess-box {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            font-weight: 500;
+            color: #222;
+        }
+        
+        .error {
+            background: #fff5f5;
+            border-color: #f0cccc;
+            color: #c00;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .stats-title {
+            font-weight: 500;
+            color: #222;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        
+        .stat-label {
+            color: #666;
+        }
+        
+        .stat-value {
+            color: #222;
+            font-weight: 500;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 2px solid #eee;
+            border-top: 2px solid #333;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading p {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>What is this?</h1>
+        <p class="subtitle">Describe something, and AI will guess what it is.</p>
+        
+        <form id="guessForm">
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" placeholder="E.g., A furry animal with whiskers that purrs..." required></textarea>
+            </div>
+            
+            <button type="submit">Guess</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Thinking...</p>
+        </div>
+        
+        <div class="result" id="result">
+            <div class="result-item">
+                <div class="result-label">Your description</div>
+                <div class="result-value" id="resultDescription"></div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Guess</div>
+                <div class="guess-box" id="resultGuess"></div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Response time</div>
+                <div class="result-value" id="resultTime"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stats-title">Session stats</div>
+                <div class="stat-row">
+                    <span class="stat-label">Total requests</span>
+                    <span class="stat-value" id="statRequests">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Average time</span>
+                    <span class="stat-value" id="statAverage">0ms</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const form = document.getElementById('guessForm');
+        const description = document.getElementById('description');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!description.value.trim()) {
+                alert('Please describe something');
+                return;
+            }
+            
+            loading.classList.add('show');
+            result.classList.remove('show');
+            
+            try {
+                const response = await fetch('/guess', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        description: description.value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                loading.classList.remove('show');
+                
+                if (data.error) {
+                    document.getElementById('resultGuess').className = 'guess-box error';
+                    document.getElementById('resultGuess').textContent = 'Error: ' + data.error;
+                } else {
+                    document.getElementById('resultDescription').textContent = data.description;
+                    document.getElementById('resultGuess').textContent = data.guess;
+                    document.getElementById('resultGuess').className = 'guess-box';
+                    document.getElementById('resultTime').textContent = data.response_time_ms + ' ms';
+                    document.getElementById('statRequests').textContent = data.stats.total_requests;
+                    document.getElementById('statAverage').textContent = Math.round(data.stats.average_time * 1000) + ' ms';
+                }
+                
+                result.classList.add('show');
+                
+            } catch (error) {
+                loading.classList.remove('show');
+                document.getElementById('resultGuess').className = 'guess-box error';
+                document.getElementById('resultGuess').textContent = 'Error: ' + error.message;
+                result.classList.add('show');
+            }
+        });
+        
+        description.focus();
+    </script>
+</body>
+</html>
