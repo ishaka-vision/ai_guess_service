@@ -17,7 +17,7 @@ It was built as a small exploration of how a backend service can interact with a
 Example:
 
 **Input**
-```json
+
 {
   "description": "A furry animal with whiskers that purrs"
 }
@@ -45,6 +45,7 @@ This separation made it possible to work with a large model without needing powe
 Instead of trying to build something complex, I focused on clarity and incremental progress:
 
 Start simple
+
 I avoided databases and frameworks at first to focus on getting the full pipeline working end-to-end.
 Use a remote model
 Running DeepSeek-R1 locally was not practical, so I used a remote server and connected via SSH.
